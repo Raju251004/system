@@ -1,0 +1,287 @@
+﻿The Architect’s Blueprint: A Comprehensive Strategic Report on Developing "The System"
+1. Executive Summary: Awakening the Player
+The intersection of productivity software and gamification has reached a point of saturation, yet it remains plagued by a critical deficiency in user retention and genuine engagement. While applications like Habitica and Level Up Life have successfully introduced the concept of "Role-Playing Game" (RPG) mechanics to daily task management, they largely rely on superficial skinning—applying pixel art and arbitrary point values to standard checklists.1 These existing solutions lack the visceral immediacy, high-stakes consequences, and adaptive intelligence that define the source material inspiring the current market demand: the "System" from the manhwa Solo Leveling. The user query outlines a vision for a "Life Operating System" (LifeOS) that transcends passive tracking to become an active, coercive, and highly rewarding agent of change, specifically tailored for the demographic of Computer Science (CS) students and high-performing self-improvers.
+This report serves as a definitive architectural and strategic roadmap for building "The System." It operates on the premise that the target user does not merely want to track their habits; they wish to gamify their existence within a framework that feels omniscient, visually immersive, and notoriously difficult to beat. The proposed application differentiates itself through three core pillars: Automated Verification (replacing the honor system with API-driven proof of work), Adaptive Difficulty (utilizing algorithmic progression to prevent stagnation), and Loss Aversion (implementing tangible digital penalties for failure).
+We will explore the technical feasibility of integrating "The System" with niche platforms relevant to the CS persona—specifically LeetCode, Codeforces, and GeeksforGeeks 4—while simultaneously managing physical biometrics via HealthKit and Google Fit. The report advocates for a tech stack built on Flutter for high-fidelity "holographic" rendering and Supabase for robust, relational state management.9 By strictly adhering to the "Solo Leveling" aesthetic—dark modes, neon blue accents, and glitch animations—and enforcing a "Penalty Zone" mechanic that utilizes OS-level restriction APIs 11, "The System" positions itself not just as a productivity tool, but as a lifestyle simulator for the modern "Hunter."
+________________
+2. Market Landscape and Psychological Mechanics
+2.1. The Failure of Current Gamification
+To construct an "unbeatable" application, one must first dissect the weaknesses of the incumbents. The gamified productivity market is currently dominated by apps that prioritize positive reinforcement exclusively, neglecting the powerful motivator of negative reinforcement or "Loss Aversion."
+2.1.1. The "Sprite-Based" Competitors
+Habitica remains the market leader, boasting a robust community and party system.2 However, its aesthetic is rooted in 8-bit retro nostalgia, which clashes with the sleek, futuristic desire of the Solo Leveling demographic. More importantly, Habitica relies entirely on manual input. A user can tick off "Did 50 Pushups" without leaving their chair, and the app will reward them. This lack of verification devalues the currency (Gold/XP) and ultimately breaks the "Magic Circle" of the game. Users know they are cheating, and the sense of achievement evaporates.
+Level Up Life offers a more granular approach to "Life RPG" mechanics, allowing users to track specific skills like "Cooking" or "Socializing".14 Yet, it suffers from "spreadsheet fatigue"—the UI is functional but uninspiring, resembling a data entry form rather than a high-tech HUD (Heads-Up Display). The lack of urgency and the passive nature of its tracking mechanisms lead to high churn rates, as the novelty of leveling up fades without a corresponding challenge or threat.16
+2.1.2. The "Solo Leveling" Clones
+Recent entrants like Solo Leveller and Arise 18 attempt to capitalize on the anime's branding. However, user feedback indicates these are often shallow "to-do lists" skinned with Solo Leveling wallpapers. They lack the "System's" defining characteristic: intelligence. In the source material, the System adapts to Jin-Woo's growth, offering "Hidden Quests" based on his behavior and scaling penalties based on his failures. The current clones act as static loggers, missing the dynamic interaction that makes the "System" feel alive.21
+2.2. The Psychology of "The System": Why It Works
+The proposed application must leverage specific psychological principles to retain users where others fail.
+2.2.1. Loss Aversion and the Penalty Zone
+Behavioral economics dictates that "losses loom larger than gains" (Kahneman & Tversky, 1979). The pain of losing $10 is psychologically twice as potent as the pleasure of gaining $10. "The System" exploits this through the Penalty Quest. In the anime, failure to complete daily tasks results in teleportation to a "Penalty Zone" where the protagonist must survive against giant centipedes.
+In the app, this translates to Digital Confinement. If the user fails their daily coding or fitness goals, the app triggers a "Dungeon Break." On Android, this utilizes the UsageStatsManager and overlay permissions to block access to entertainment apps (Instagram, TikTok, Games).22 On iOS, it utilizes the Screen Time API to restrict app categories.11 This turns procrastination into a tangible threat, forcing compliance through the avoidance of digital pain.
+2.2.2. The Flow Channel
+Csikszentmihalyi’s "Flow Theory" suggests that engagement is maximized when the difficulty of a task perfectly matches the user's skill level. If a task is too hard, the user feels anxiety; if too easy, boredom. Existing apps often have static difficulty (e.g., "Run 5km" every day). "The System" must implement an Adaptive Difficulty Algorithm.24 If a user completes their 5km run with a low heart rate and high speed (verified via HealthKit), the System must fundamentally alter the next day's quest—perhaps increasing the distance to 5.5km or demanding a faster pace. This dynamic scaling keeps the user constantly in the "Flow Channel," preventing the boredom that kills retention in standard apps.
+2.2.3. The "Hunter" Persona: A Niche Focus
+By targeting CS students and developers, the app taps into a demographic already conditioned to value metrics, rankings, and optimization. This group is familiar with the concept of "grinding" (in MMORPGs or LeetCode) and appreciates data integrity. They are likely to reject manual input apps as "inefficient" but will embrace an app that automatically pulls their Codeforces rating via API, validating their "Intelligence" stat with irrefutable data.5 This specificity allows "The System" to offer features generic apps cannot, such as "Github Commit Streak" bonuses or "Stack Overflow Reputation" integration.
+________________
+3. Visual Language and User Interface Strategy
+The "System" is defined by its interface. In the anime, it is an augmented reality (AR) overlay visible only to the player—a glowing, blue, semi-transparent window that floats in mid-air. Replicating this "diegetic" UI on a mobile screen requires a sophisticated design system that prioritizes immersion over standard material design conventions.
+3.1. Design Philosophy: The "Holographic" Aesthetic
+Standard "Flat Design" or "Material You" is insufficient. The app must utilize Skeuomorphic Futurism—interfaces that look like projected light.
+3.1.1. Color Palette and Lighting
+The application must strictly adhere to a Dark Mode paradigm to sell the "System" fantasy and save battery on OLED screens (common in high-end devices used by the target demographic).
+Element
+	Color Code (Hex)
+	Usage
+	Psychological Effect
+	The Void (Background)
+	#050510
+	Main canvas background.
+	Creates depth; mimics the "darkness" of the dungeons.
+	System Blue (Primary)
+	#00AEEF
+	Borders, primary text, active states.
+	Represents the cold, logical, supernatural nature of the System.
+	Mana Blue (Secondary)
+	#2E86DE
+	Progress bars, MP gauge.
+	Differentiates resource metrics from structural UI elements.
+	Alert Red (Danger)
+	#FF3333
+	Penalty notifications, HP low warning.
+	Triggers immediate attention; signifies "Danger/Death."
+	Gold (Reward)
+	#FFD700
+	Shop currency, Level Up text.
+	signifies rarity and achievement.
+	Terminal Green (Success)
+	#00FF00
+	Quest Complete, Code Accepted.
+	Classic retro-terminal feel for coding achievements.
+	Lighting Effects: Unlike flat UI, "System" elements must emit light. This is achieved in the frontend (Flutter) using BoxShadow with high blur radii. Every window border should have a subtle "breathing" animation where the opacity of the glow oscillates between 0.5 and 0.9, simulating a live energy projection.25
+3.1.2. Typography and Readability
+To mimic the "computerized" nature of the System, the app should utilize a pairing of Monospace and Geometric Sans-Serif fonts.
+* Headers & Data: JetBrains Mono or Fira Code. These are familiar to CS students as IDE fonts, reinforcing the "coding" theme.
+* Body Text: Rajdhani or Orbitron. These fonts have squared-off curves that evoke a sci-fi, HUD-like feel without sacrificing readability.25
+3.2. Motion Design: The "Glitch" and "Materialization"
+The way UI elements enter the screen is crucial. In Solo Leveling, windows don't slide in; they materialize or unfold.
+* Window Open Animation: A standard "slide up" feels like a phone app. "The System" windows should use a ScaleTransition starting from a horizontal line (scale Y=0 to 1) combined with a FadeTransition. This mimics a holographic projector turning on.
+* The Glitch Effect: Upon specific events (Level Up, Penalty Trigger, hidden quest discovery), the UI should engage a "Chromatic Aberration" shader. This shifts the Red and Blue color channels slightly apart horizontally for 100-300ms, accompanied by a "static" sound effect. This reinforces the idea that the System is a digital construct interacting with reality.26
+* Particle Systems: The background shouldn't be static black. It should feature subtle, floating "dust motes" or "mana particles" (blue pixels) drifting upward. This adds life to the static screens (Stats, Inventory).8
+3.3. Sound Design (Haptics and Audio)
+The sensory experience must extend beyond visuals.
+* The "Ding": The notification sound for a new quest must be sharp, metallic, and resonant—distinct from the soft "pop" of standard iOS/Android notifications.
+* Haptic Feedback:
+   * Heavy Impact: When the user levels up or completes a strength set.
+   * Rapid Ticks: When XP bars are filling up (odometer effect).
+   * Glitch Vibration: Short, sharp pulses when the Penalty screen activates.
+________________
+4. The Physical Domain: Engineering the "Body"
+The "System" divides human capability into stats. The Physical Domain governs Strength (STR), Agility (AGI), and Vitality (VIT). Unlike manual trackers, this module relies on sensor data and algorithmic periodization.
+4.1. Onboarding: The "Hunter's License"
+The onboarding process acts as a calibration phase.
+1. Biometric Input: Age, Height, Weight, Gender.
+2. Calculations:
+   * BMI (Body Mass Index): Initial "Constitution" assessment.
+   * TDEE (Total Daily Energy Expenditure): Determines "Daily Mana" (Calorie) requirements.
+3. The Baseline Test (The "E-Rank" Exam): The user is prompted to perform a max-effort set of pushups and a 1km run.
+   * Input: User enters reps and run time (verified via Pedometer/GPS history if available).
+   * Classification:
+      * < 10 Pushups / > 8min km: E-Rank.
+      * 10-30 Pushups / 6-8min km: D-Rank.
+      * 30-50 Pushups / 5-6min km: C-Rank.
+      * Elite: S-Rank (Reserved for top 1%).
+4.2. Strength (STR): The Progressive Overload Algorithm
+The core of the physical module is the implementation of Progressive Overload.28 The System must act as a personal trainer that slowly increases volume.
+Algorithm Logic:
+Let    be the volume (Reps    Weight) for session   .
+Let    be the User's "Rate of Perceived Exertion" (1-10).
+  
+
+Implementation:
+* Daily Quest: "Perform 100 Pushups."
+* Verification:
+   * Level 1 (Basic): Manual entry.
+   * Level 2 (Pro): Accelerometer-based detection. The user places the phone on the floor under their chest. The proximity sensor counts the rep when the chest nears the phone, or the accelerometer detects the rhythmic up/down motion.
+   * Level 3 (Elite): Computer Vision (via Google ML Kit). The front camera tracks the user's pose (shoulder and hip points) to count reps and check form depth.
+4.3. Agility (AGI) and Vitality (VIT): Sensor Integration
+* Agility (Steps & Speed):
+   * The app must integrate with Apple HealthKit (iOS) and Google Health Connect (Android) to pull step counts continuously.
+   * The "Run" Quest: The app uses GPS to track a 10km run. It calculates the average pace. Improvement in pace directly increases the AGI stat.
+   * Anti-Cheat: The System checks for unrealistic speeds (e.g., > 30km/h implies driving) to prevent XP farming.30
+* Vitality (Sleep & Recovery):
+   * Sleep duration is pulled from health APIs.
+   * Logic: If sleep < 6 hours, the user receives a "Fatigue Debuff" (-10% XP gain for the day). If sleep > 7 hours, they get a "Well Rested" buff. This gamifies the act of sleeping, which is crucial for the target demographic (students) who often neglect it.
+________________
+5. The Mental Domain: The CSE "Intelligence" Engine
+For the Computer Science student, "leveling up" is synonymous with mastering algorithms and data structures. "The System" differentiates itself by integrating directly with the tools of the trade: LeetCode, Codeforces, and GeeksforGeeks.
+5.1. Integration Strategy: The "Scraping" Proxy
+Most competitive programming platforms do not offer robust public APIs for third-party write access, and their read APIs can be limited. The System requires a "Middleware" layer to normalize this data.4
+5.1.1. LeetCode Integration
+LeetCode uses a GraphQL endpoint that is publicly accessible but requires specific query structures.
+* Method: The System's backend (Supabase Edge Functions) sends a POST request to https://leetcode.com/graphql.
+* Payload:
+JSON
+{
+ "query": "query userProfile($username: String!) { matchedUser(username: $username) { submitStats: submitStatsGlobal { acSubmissionNum { difficulty count } } } }",
+ "variables": { "username": "user_handle" }
+}
+
+* Rate Limiting: To avoid IP bans, the System should strictly cache this data. The app fetches the user's stats once per user-initiated refresh or once every 4 hours automatically.
+* Daily Challenge Verification: The System checks the specific dailyCodingChallengeV2 endpoint to see if the user completed the global daily problem. Completion grants a "Daily Box" (Gacha reward).
+5.1.2. Codeforces and GeeksforGeeks
+   * Codeforces: The API is more open (user.status). The System can poll this to track "Contest Rating."
+   * Feature: "Rank Integration." If a user promotes from "Pupil" to "Specialist" on Codeforces, the System automatically promotes their in-app Rank (e.g., D-Rank to C-Rank) and grants a massive XP bounty.
+   * GeeksforGeeks: Lacks a public API.
+   * Strategy: The user provides their profile URL. The backend uses a headless browser (Puppeteer) or a lightweight HTML parser (Cheerio) to scrape the "Problems Solved" count from the public DOM.
+   * Constraint: This is fragile; if GFG changes their DOM, the scraper breaks. The app must handle this gracefully, marking the integration as "Maintenance" until patched.32
+5.2. Intelligence (INT): The Algorithm
+The INT stat is a composite metric.
+  
+
+   * Adaptive Mental Quests: The System analyzes the user's submission history.
+   * Scenario: User fails 3 Dynamic Programming problems in a row.
+   * Response: The System generates a "Hidden Quest: Remedial Training." Requirement: "Read 2 articles on GeeksforGeeks about Memoization and solve 1 Easy DP problem."
+   * Reward: "Skill Unlocked: Dynamic Programming I."
+5.3. Career Goals: The "Job Change" Quest
+For a CSE student, the ultimate goal is a career. The System gamifies the internship hunt.
+   * Quest: "Apply to 5 Companies."
+   * Verification: Manual (Honor system) or via Email parsing (advanced/intrusive). For V1, we stick to manual "checkbox" with a "Penalty" if the user lies (psychological contract).
+   * Quest: "Mock Interview."
+   * Integration: Link to Pramp or InterviewBit. The user logs a session.
+________________
+6. The Consequence Engine: Engineering the Penalty Zone
+This is the app's Unique Selling Point (USP). Most apps are all carrot, no stick. "The System" uses the stick effectively.
+6.1. The Penalty Logic: "Dungeon Break"
+If the "Daily Quest" (Physical + Mental) is incomplete by 23:59:
+   1. Phase 1: Warning (23:00 - 23:59): The UI turns red. A countdown timer appears on the widget/lock screen.
+   2. Phase 2: The Break (00:00):
+   * The user is demoted (XP Loss).
+   * A Penalty Quest is assigned. This quest is non-negotiable. Until completed, the app attempts to restrict phone usage.
+6.2. Technical Implementation: Locking the Device
+6.2.1. Android: Kiosk and Overlay Mode
+Android allows extensive control, making it the primary platform for the "Hardcore" version.12
+   * Overlay (SYSTEM_ALERT_WINDOW): The app draws a full-screen view over all other apps. This view is transparent-black (90% opacity) and intercepts touch events. It displays the message: "Penalty Quest Active: Run 5km to unlock device."
+   * Usage Stats (AppOpsManager): The app detects if the user opens "Blacklisted" apps (TikTok, Instagram). If detected, it immediately launches the "Penalty Intent," bringing the System back to the foreground.
+   * Device Admin (Optional): For extreme users, the app can request Device Admin privileges to disable the camera or force-lock the screen, though this risks Google Play rejection if not framed as a "Digital Wellbeing" feature.
+6.2.2. iOS: The Walled Garden Strategy
+iOS does not allow apps to draw over others or lock the device completely. We must be creative.11
+   * Screen Time API (FamilyControls): The app requests permission to "Shield" specific application groups. When the Penalty triggers, the app activates a DeviceActivityMonitor extension that revokes the token for Social & Games categories. The OS then prevents these apps from launching.
+   * Critical Alerts: The app requests "Critical Alert" entitlements. During a penalty, it plays a loud, jarring sound every 15 minutes, even if the phone is on Silent/Do Not Disturb, until the user opens the app and completes the task. This utilizes social pressure (shame) as a locking mechanism.34
+6.2.3. The "Survival" Quest
+The Penalty Quest must be immediate and physical.
+   * Task: "The Survival."
+   * Mechanic: The user must keep the phone in motion (walking/running) for 30 minutes. If the accelerometer detects stillness for > 10 seconds, the timer resets. This prevents the user from simply sitting on the couch and waiting it out.
+________________
+7. Technical Architecture and Tech Stack
+To build a scalable, secure, and responsive application, we must separate the concerns between the Client (UI), the Backend (State), and the Intelligence (AI).
+7.1. Technology Selection Matrix
+
+
+Component
+	Technology
+	Justification
+	Frontend
+	Flutter (Dart)
+	Single codebase for iOS/Android. The Skia engine allows for pixel-perfect custom shaders (Glitch/Holo effects) that are harder to optimize in React Native. "Hot Reload" speeds up UI iteration.
+	Backend
+	Supabase
+	Offers PostgreSQL (relational data is essential for RPG inventories), Auth, and Realtime subscriptions out of the box. Open-source nature aligns with the developer audience.9
+	API Layer
+	Supabase Edge Functions (Deno)
+	Serverless Typescript functions to handle the "Proxy" scraping of LeetCode/Codeforces without exposing logic to the client.
+	Local DB
+	Drift (SQLite)
+	"Offline-first" architecture. The System must work in a basement gym without Wi-Fi. Syncs to Supabase when online.
+	AI/ML
+	Python (FastAPI) or TFLite
+	Complex difficulty curves are calculated in the cloud (Python). Real-time pose detection (pushup counting) runs on-device via TensorFlow Lite to ensure low latency.
+	7.2. Database Schema (PostgreSQL)
+The database must support complex relationships. A NoSQL solution (like Firebase) would struggle with the interconnected nature of stats, quests, and history.
+   * profiles: id (UUID), username, rank (Enum: E, D, C, B, A, S), level (Int), xp (Int), stats (JSONB: {str: 10, agi: 15, int: 40}).
+   * quests: id, title, description, type (Daily, Weekly, Penalty), requirements (JSONB: {type: "leetcode", count: 1, difficulty: "medium"}), xp_reward (Int).
+   * player_quests: id, player_id, quest_id, status (active, completed, failed), progress (Int), created_at, expires_at.
+   * audit_logs: id, player_id, action (XP_GAIN, PENALTY_TRIGGER), source (String), timestamp. Crucial for anti-cheat analysis.
+7.3. Security and Anti-Cheat
+Since users are "High-Tier" CS students, they will try to hack the app to inflate their stats.
+   * Request Signing: All API requests from the Flutter client to Supabase must be signed with a hash of the payload + a secret key (obfuscated in the binary) to prevent "Replay Attacks" (e.g., re-sending the "Quest Complete" packet).
+   * Server-Side Validation: The client never tells the server "I leveled up." The client says "I did 10 pushups." The server validates this, calculates the new XP, and tells the client "You leveled up."
+   * GPS Spoofing: For running quests, the app checks for "Mock Location" flags in the Android developer settings. If detected, the quest is voided.
+________________
+8. The "Architect" AI: Algorithms and Logic
+The intelligence of the System defines the user experience. It must be more than random number generation.
+8.1. The "Awakening" Periodization Model
+The System uses Non-Linear Periodization for fitness.
+   * Week 1-3 (Accumulation): High Volume, Low Intensity. (e.g., Many pushups, slow runs).
+   * Week 4 (Deload): Volume drops by 40%. Allows recovery (Vitality boost).
+   * Week 5-7 (Intensification): Low Volume, High Intensity. (e.g., Weighted pushups, sprints).
+   * Week 8 (The Boss Fight): A "Gate" opens. A massive challenge (e.g., Half-Marathon or 500 Pushups in a day). Success promotes the user's Rank.
+8.2. The "Brain Strain" ELO System
+For coding, the System calculates a hidden "Mental MMR."
+   * Each LeetCode problem has a rating (approximate).
+   * If User (Rating 1200) solves Problem (Rating 1500) -> Large MMR Gain.
+   * If User (Rating 1200) solves Problem (Rating 800) -> Near Zero MMR Gain.
+   * This prevents users from farming "Easy" problems to level up their INT stat. They must tackle harder concepts to grow.
+________________
+9. Strategic Roadmap and Monetization
+9.1. Phase 1: E-Rank (The MVP) - Months 1-3
+   * Goal: Build the "Tracker" with a soul.
+   * Scope:
+   * Manual entry for fitness/coding.
+   * "System" UI fully implemented (Flutter).
+   * Basic Penalty (Red screen + annoying notification).
+   * Platform: Android Early Access.
+9.2. Phase 2: C-Rank (The Connected Hunter) - Months 4-6
+   * Goal: Automation.
+   * Scope:
+   * Integration of LeetCode/Codeforces Scrapers.
+   * HealthKit/Google Fit Pedometer sync.
+   * Implementation of the "Penalty Zone" (App Blocking).
+9.3. Phase 3: S-Rank (The Shadow Monarch) - Months 7-12
+   * Goal: Social and AI.
+   * Scope:
+   * Guilds: Users form parties. If one member fails a daily quest, all members take a "Status Hit" (Habitica-style accountability).
+   * Shadows: Users unlock "Shadow Soldiers" (Avatars) that overlay on the screen as helpers.
+9.4. Monetization Strategy: "Loss Aversion" Model
+Traditional subs (Pay for Features) are boring.
+   * The "StickK" Model: Users can optionally pledge $10/month. If they maintain a 100% completion rate, they keep it (or get a discount). If they fail a Penalty Quest, they lose the money (donated to charity or the dev).35
+   * "System Keys": Sell "Dungeon Keys" (IAP) that allow users to retry a failed quest without penalty. This is a "Pay-to-Save" model, high converting for invested users.
+   * Cosmetics: Skins for the UI (e.g., "Red Gate Theme", "Shadow Purple Theme").
+10. Conclusion
+"The System" represents a paradigm shift in productivity applications. It moves away from the "Assistant" model (helping you do tasks) to the "Governor" model (commanding you to do tasks). By specifically targeting the Computer Science and Bio-hacker demographic with deep integrations (LeetCode, HealthKit) and a "Solo Leveling" narrative wrapper, it creates a product that is not just useful, but culturally resonant. The technical barrier is high—requiring complex scraping, OS-level hacks for penalties, and rigorous anti-cheat logic—but the payoff is a highly sticky, "unbeatable" application that users will love to fear. The roadmap presented here provides the precise steps to bring this digital fantasy into reality.
+Project Status: Awaiting "Awakening" (Kickoff).
+Recommended Next Step: Prototype the "Window Open" animation in Flutter to validate the visual language.
+Works cited
+   1. Habitica - Gamify Your Life, accessed February 1, 2026, https://habitica.com/
+   2. Habitica: Gamified Taskmanager - App Store - Apple, accessed February 1, 2026, https://apps.apple.com/us/app/habitica-gamified-taskmanager/id994882113
+   3. accessed February 1, 2026, https://apps.apple.com/jo/app/goals-level-up-life/id6741438478#:~:text=Key%20Features%3A%20%2D%20Set%20and%20Track,and%20see%20your%20streaks%20grow.
+   4. An RESTful API for LEETCODE Statistics – Nextra, accessed February 1, 2026, https://leetcode-restful-api.vercel.app/
+   5. Codeforces.API - Hackage, accessed February 1, 2026, https://hackage.haskell.org/package/codeforces-cli/docs/Codeforces-API.html
+   6. How does an API Work ? - GeeksforGeeks, accessed February 1, 2026, https://www.geeksforgeeks.org/node-js/how-does-an-api-work/
+   7. I Wish I Knew These 10 Flutter UI Packages Earlier | Flutter for beginners - YouTube, accessed February 1, 2026, https://www.youtube.com/watch?v=n_9XYZ6IrSc
+   8. Firebase vs Supabase: Choosing the Right Backend for Your Next Project - Medium, accessed February 1, 2026, https://medium.com/@riyanshchouhan1223/firebase-vs-supabase-choosing-the-right-backend-for-your-next-project-5a2eb0215cf3
+   9. Supabase vs Firebase, accessed February 1, 2026, https://supabase.com/alternatives/supabase-vs-firebase
+   10. Screen Time | Apple Developer Documentation, accessed February 1, 2026, https://developer.apple.com/documentation/screentime
+   11. Lock task mode | Android Enterprise, accessed February 1, 2026, https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode
+   12. Habitica Vs Lifeup Vs Habitify | Which Productivity App is BETTER in 2025? - YouTube, accessed February 1, 2026, https://www.youtube.com/watch?v=ahKnA3CN3K0
+   13. Top 10 Gamified Productivity Apps for 2025 - Yu-kai Chou, accessed February 1, 2026, https://yukaichou.com/lifestyle-gamification/the-top-ten-gamified-productivity-apps/
+   14. Improve daily habits with Level Up Life | Gamify List, accessed February 1, 2026, https://gamifylist.com/app/level-up-life
+   15. Why does every productivity app make me less productive? - Reddit, accessed February 1, 2026, https://www.reddit.com/r/productivity/comments/1mi7h3l/why_does_every_productivity_app_make_me_less/
+   16. OK...My productivity app flopped — I need brutally honest opinion : r/ProductivityApps - Reddit, accessed February 1, 2026, https://www.reddit.com/r/ProductivityApps/comments/1orkacm/okmy_productivity_app_flopped_i_need_brutally/
+   17. Arise: Level Up In Real Life - Apps on Google Play, accessed February 1, 2026, https://play.google.com/store/apps/details?id=llc.sololeveling.Arise
+   18. Solo Leveller : The System - Apps on Google Play, accessed February 1, 2026, https://play.google.com/store/apps/details?id=com.app.sololeveller
+   19. accessed February 1, 2026, https://apps.apple.com/us/app/dual-solo-leveling-for-life/id6739692758
+   20. I built a Solo Leveling inspired “System” app to gamify real life. I would love some feedback. : r/gamification - Reddit, accessed February 1, 2026, https://www.reddit.com/r/gamification/comments/1pwue26/i_built_a_solo_leveling_inspired_system_app_to/
+   21. AppBlock: Block Apps & Website - App Store - Apple, accessed February 1, 2026, https://apps.apple.com/us/app/appblock-block-apps-website/id1515753232
+   22. Android UsageStatsManager - Tracking App Usage with Ease - CIIT Training, accessed February 1, 2026, https://ciit-training.com/en/2024/09/16/android-usagestatsmanager-tracking-app-usage-with-ease/
+   23. Engagement-Oriented Dynamic Difficulty Adjustment - MDPI, accessed February 1, 2026, https://www.mdpi.com/2076-3417/15/10/5610
+   24. Solo Leveling designs, themes, templates and downloadable graphic elements on Dribbble, accessed February 1, 2026, https://dribbble.com/tags/solo-leveling
+   25. Shiny holographic cards in react native using Skia | by Jerin John K. | Medium, accessed February 1, 2026, https://medium.com/@jerinjohnk/shiny-holographic-cards-in-react-native-using-skia-81a334fa182d
+   26. CSS Text Animations: 40 Creative Examples to Try - Prismic, accessed February 1, 2026, https://prismic.io/blog/css-text-animations
+   27. The Overload Principle | Progressive Overload Workout Plan - - K Squared Fitness, accessed February 1, 2026, https://ksquaredfitness.com/progressive-overload-workout-plan/
+   28. Progressive Overload: What Is It, Examples And Workout Plans - PureGym, accessed February 1, 2026, https://www.puregym.com/blog/progressive-overload/
+   29. FitnessAI — Get Stronger, Faster with Artificial Intelligence, accessed February 1, 2026, https://www.fitnessai.com/
+   30. Custom LeetCode API to retrieve User Details & Problem Details - Discuss, accessed February 1, 2026, https://leetcode.com/discuss/general-discussion/4617261/Custom-LeetCode-API-to-retrieve-User-Details-and-Problem-Details/
+   31. arnoob16/GeeksForGeeksAPI: Unofficial GeeksForGeeks API - GitHub, accessed February 1, 2026, https://github.com/arnoob16/GeeksForGeeksAPI
+   32. Screen time API can be disabled ea… | Apple Developer Forums, accessed February 1, 2026, https://developer.apple.com/forums/thread/727291
+   33. How to let audio play when the iOS device is in Silent mode?, accessed February 1, 2026, https://developer.bitmovin.com/playback/docs/ios-how-to-let-audio-play-when-the-ios-device-is-in-silent-mode
+   34. stickK, accessed February 1, 2026, https://www.stickk.com/
+   35. 3 Ways to Monetize your App that Actually Work : r/ProductivityApps - Reddit, accessed February 1, 2026, https://www.reddit.com/r/ProductivityApps/comments/1kqgxau/3_ways_to_monetize_your_app_that_actually_work/
