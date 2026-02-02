@@ -59,6 +59,9 @@ export class User {
   @Column({ nullable: true })
   title: string;
 
+  @Column({ default: false })
+  isOnboardingCompleted: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

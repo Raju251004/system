@@ -16,7 +16,7 @@ export class AuthService {
     email: string,
     pass: string,
   ): Promise<Omit<User, 'passwordHash'> | null> {
-    const user = await this.usersService.findOneByEmail(email);
+    const user = await this.usersService.findByEmailWithPassword(email);
     if (user && (await bcrypt.compare(pass, user.passwordHash))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { passwordHash, ...result } = user;

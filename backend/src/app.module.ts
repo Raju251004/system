@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { QuestsModule } from './quests/quests.module';
 import { SeedModule } from './seed/seed.module';
 import { GeminiModule } from './gemini/gemini.module';
+import { AssessmentModule } from './assessment/assessment.module';
 import { LeetCodeModule } from './leetcode/leetcode.module';
 
 @Module({
@@ -35,6 +36,7 @@ import { LeetCodeModule } from './leetcode/leetcode.module';
     GeminiModule,
     SeedModule,
     LeetCodeModule,
+    AssessmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

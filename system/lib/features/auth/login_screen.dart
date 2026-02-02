@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:system/features/auth/presentation/auth_controller.dart';
 import 'package:system/features/auth/presentation/auth_state_provider.dart';
 import 'package:system/features/auth/register_screen.dart';
-import 'package:system/features/status/presentation/status_screen.dart';
+import 'package:system/core/presentation/main_scaffold.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -39,23 +39,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(authControllerProvider.notifier).login(email, password);
 
-      // Update auth state
-      await ref.read(authStateProvider.notifier).setAuthenticated();
+      // Refresh auth state to trigger redirect logic
+      await ref.read(authStateProvider.notifier).refresh();
 
-      if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const StatusScreen()),
-          (route) => false, // Remove all previous routes
-        );
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('WELCOME TO THE SYSTEM.')));
-      }
+      // Navigation is handled by AuthCheckScreen in main.dart
     } catch (e) {
       if (mounted) {
+        final errorMessage = e.toString().replaceAll('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Access Denied: ${e.toString()}')),
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
         );
       }
     }

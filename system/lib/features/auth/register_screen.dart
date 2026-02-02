@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:system/features/auth/presentation/auth_controller.dart';
 import 'package:system/features/auth/presentation/auth_state_provider.dart';
-import 'package:system/features/status/presentation/status_screen.dart';
+import 'package:system/core/presentation/main_scaffold.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -18,12 +18,77 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
+  // Password Strength State
+  bool _hasMinLength = false;
+  bool _hasUppercase = false;
+  bool _hasLowercase = false;
+  bool _hasDigits = false;
+  bool _hasSpecialChars = false;
+
   // Aesthetic Colors
   static const Color _bgDark = Color(0xFF0F0518);
   static const Color _cardBg = Color(0xFF1A0B2E);
   static const Color _accentPurple = Color(0xFF9D4EDD);
   static const Color _neonPurple = Color(0xFFB000FF);
   static const Color _inputBg = Color(0xFF0A0510);
+  static const Color _errorRed = Color(0xFFFF3333);
+  static const Color _successGreen = Color(0xFF00FF00);
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_updatePasswordStrength);
+  }
+
+  @override
+  void dispose() {
+    _passwordController.removeListener(_updatePasswordStrength);
+    _passwordController.dispose();
+    _emailController.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  void _updatePasswordStrength() {
+    final password = _passwordController.text;
+    setState(() {
+      _hasMinLength = password.length >= 8;
+      _hasUppercase = password.contains(RegExp(r'[A-Z]'));
+      _hasLowercase = password.contains(RegExp(r'[a-z]'));
+      _hasDigits = password.contains(RegExp(r'[0-9]'));
+      _hasSpecialChars = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
+    });
+  }
+
+  bool get _isPasswordValid =>
+      _hasMinLength &&
+      _hasUppercase &&
+      _hasLowercase &&
+      _hasDigits &&
+      _hasSpecialChars;
+
+  double get _passwordStrength {
+    int score = 0;
+    if (_hasMinLength) score++;
+    if (_hasUppercase) score++;
+    if (_hasLowercase) score++;
+    if (_hasDigits) score++;
+    if (_hasSpecialChars) score++;
+    return score / 5.0;
+  }
+
+  Color get _strengthColor {
+    if (_passwordStrength <= 0.2) return _errorRed;
+    if (_passwordStrength <= 0.6) return Colors.orange;
+    return _successGreen;
+  }
+
+  String get _strengthText {
+    if (_passwordStrength <= 0.2) return 'WEAK';
+    if (_passwordStrength <= 0.6) return 'MEDIUM';
+    if (_passwordStrength < 1.0) return 'STRONG';
+    return 'MAXIMUM';
+  }
 
   Future<void> _handleRegister() async {
     final email = _emailController.text.trim();
@@ -37,6 +102,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
+    if (!_isPasswordValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password does not meet security requirements.'),
+          backgroundColor: _errorRed,
+        ),
+      );
+      return;
+    }
+
     try {
       // Register the user
       await ref
@@ -46,24 +121,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       // Auto-login after registration
       await ref.read(authControllerProvider.notifier).login(email, password);
 
-      // Update auth state
-      await ref.read(authStateProvider.notifier).setAuthenticated();
+      // Refresh auth state to trigger redirect logic (Onboarding vs Main)
+      await ref.read(authStateProvider.notifier).refresh();
 
-      if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const StatusScreen()),
-          (route) => false, // Remove all previous routes
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('REGISTRATION SUCCESSFUL. WELCOME.')),
-        );
-      }
+      // No need to manually navigate - AuthCheckScreen (main.dart) listens to authState
+      // and will redirect to OnboardingScreen (since isOnboardingCompleted is false)
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration Failed: ${e.toString()}')),
-        );
+        final errorMessage = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     }
   }
@@ -156,26 +224,59 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 8),
                       _buildTextField(
                         controller: _passwordController,
-                        hint: 'Choose a password',
+                        hint: 'Create a strong password',
                         icon: Icons.lock_outline,
                         isPassword: true,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
+                      // Password Strength Indicator
+                      if (_passwordController.text.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: LinearProgressIndicator(
+                                value: _passwordStrength,
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.1,
+                                ),
+                                color: _strengthColor,
+                                minHeight: 4,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              _strengthText,
+                              style: GoogleFonts.rajdhani(
+                                color: _strengthColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                      const SizedBox(height: 16),
                       // Action Button
                       Container(
                         width: double.infinity,
                         height: 56,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          gradient: const LinearGradient(
-                            colors: [_neonPurple, _accentPurple],
+                          gradient: LinearGradient(
+                            colors: _isPasswordValid
+                                ? [_neonPurple, _accentPurple]
+                                : [Colors.grey.shade800, Colors.grey.shade700],
                           ),
                           boxShadow: [
-                            BoxShadow(
-                              color: _neonPurple.withValues(alpha: 0.4),
-                              blurRadius: 15,
-                              offset: const Offset(0, 4),
-                            ),
+                            if (_isPasswordValid)
+                              BoxShadow(
+                                color: _neonPurple.withValues(alpha: 0.4),
+                                blurRadius: 15,
+                                offset: const Offset(0, 4),
+                              ),
                           ],
                         ),
                         child: ElevatedButton(
@@ -196,7 +297,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   style: GoogleFonts.orbitron(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: _isPasswordValid
+                                        ? Colors.white
+                                        : Colors.white.withValues(alpha: 0.5),
                                     letterSpacing: 2,
                                   ),
                                 ),

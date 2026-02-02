@@ -19,6 +19,9 @@ class AuthController extends AsyncNotifier<void> {
       final repository = ref.read(authRepositoryProvider);
       await repository.login(email, password);
     });
+    if (state.hasError) {
+      throw state.error!;
+    }
   }
 
   Future<void> register(String email, String username, String password) async {
@@ -27,5 +30,8 @@ class AuthController extends AsyncNotifier<void> {
       final repository = ref.read(authRepositoryProvider);
       await repository.register(email, username, password);
     });
+    if (state.hasError) {
+      throw state.error!;
+    }
   }
 }

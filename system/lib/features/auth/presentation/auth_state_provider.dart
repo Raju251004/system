@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../../status/data/status_repository.dart';
 
-enum AuthStatus { initial, authenticated, unauthenticated }
+enum AuthStatus { initial, authenticated, unauthenticated, onboardingRequired }
 
 final authStateProvider = AsyncNotifierProvider<AuthStateNotifier, AuthStatus>(
   AuthStateNotifier.new,
@@ -27,8 +27,17 @@ class AuthStateNotifier extends AsyncNotifier<AuthStatus> {
     // Validate token by trying to fetch profile
     try {
       final statusRepo = ref.read(statusRepositoryProvider);
-      await statusRepo.getProfile();
-      return AuthStatus.authenticated;
+      final profile = await statusRepo.getProfile();
+
+      // Check if onboarding is completed
+      // The backend now returns isOnboardingCompleted in the profile
+      final isCompleted = profile['isOnboardingCompleted'] as bool? ?? false;
+
+      if (isCompleted) {
+        return AuthStatus.authenticated;
+      } else {
+        return AuthStatus.onboardingRequired;
+      }
     } catch (e) {
       // Token is invalid or expired
       await authRepo.logout();

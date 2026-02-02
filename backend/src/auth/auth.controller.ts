@@ -11,10 +11,14 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -36,17 +40,21 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return this.authService.login(user);
+    return this.authService.login(user); // returns token and basic user info
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  getProfile(
-    @Request()
-    req: {
-      user: { userId: string; username: string; email: string };
-    },
-  ): { userId: string; username: string; email: string } {
-    return req.user;
+  async getProfile(@Request() req: { user: { userId: string } }) {
+    // Fetch fresh user data from DB to get isOnboardingCompleted status
+    // req.user has userId from JwtStrategy
+    const user = await this.usersService.findOne(req.user.userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    // Remove passwordHash from response
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...result } = user;
+    return result;
   }
 }

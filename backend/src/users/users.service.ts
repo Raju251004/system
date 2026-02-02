@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { User, Rank } from './entities/user.entity';
@@ -11,6 +11,19 @@ export class UsersService {
   ) {}
 
   async create(userData: DeepPartial<User>): Promise<User> {
+    const existingEmail = await this.usersRepository.findOneBy({
+      email: userData.email,
+    });
+    if (existingEmail) {
+      throw new ConflictException('Email already in use');
+    }
+    const existingUsername = await this.usersRepository.findOneBy({
+      username: userData.username,
+    });
+    if (existingUsername) {
+      throw new ConflictException('Username already in use');
+    }
+
     const user = this.usersRepository.create(userData);
     return this.usersRepository.save(user);
   }
@@ -19,8 +32,25 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
+  async findByEmailWithPassword(email: string): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .addSelect('user.passwordHash')
+      .getOne();
+  }
+
   async findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
+  }
+
+  async update(id: string, updateData: DeepPartial<User>): Promise<User> {
+    await this.usersRepository.update(id, updateData);
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    return user;
   }
 
   async addXp(userId: string, amount: number): Promise<User> {

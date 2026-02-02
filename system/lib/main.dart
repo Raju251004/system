@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:system/core/theme/app_theme.dart';
 import 'package:system/features/auth/presentation/auth_state_provider.dart';
 import 'package:system/features/home/presentation/welcome_screen.dart';
-import 'package:system/features/status/presentation/status_screen.dart';
+import 'package:system/core/presentation/main_scaffold.dart';
+import 'package:system/features/onboarding/presentation/onboarding_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +37,9 @@ class AuthCheckScreen extends ConsumerWidget {
       data: (status) {
         switch (status) {
           case AuthStatus.authenticated:
-            return const StatusScreen();
+            return const MainScaffold();
+          case AuthStatus.onboardingRequired:
+            return const OnboardingScreen();
           case AuthStatus.unauthenticated:
             return const WelcomeScreen();
           case AuthStatus.initial:
