@@ -8,7 +8,7 @@ export class AssessmentService {
 
   constructor(private usersService: UsersService) {}
 
-  async submit(userId: string, _data: CreateAssessmentDto) {
+  async submit(userId: string, _data: CreateAssessmentDto): Promise<{ message: string }> {
     // In the future, save 'data' to PhysicalStats/MentalStats entities
     // For now, just mark onboarding as completed
     await this.usersService.update(userId, {
