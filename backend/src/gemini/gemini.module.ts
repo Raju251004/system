@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
-import { GeminiService } from './gemini.service';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
+import { GeminiService } from './gemini.service';
+import { HuggingFaceService } from './huggingface.service';
+import { IntelligenceController } from './intelligence.controller';
 
 @Module({
-  imports: [ConfigModule],
-  providers: [GeminiService],
-  exports: [GeminiService],
+  imports: [HttpModule, ConfigModule],
+  controllers: [IntelligenceController],
+  providers: [GeminiService, HuggingFaceService],
+  exports: [GeminiService, HuggingFaceService],
 })
 export class GeminiModule {}

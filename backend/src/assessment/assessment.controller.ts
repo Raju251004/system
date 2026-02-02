@@ -10,7 +10,10 @@ export class AssessmentController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('submit')
-  submit(@Request() req, @Body() data: CreateAssessmentDto): Promise<{ message: string }> {
+  submit(
+    @Request() req: { user: { userId: string } },
+    @Body() data: CreateAssessmentDto,
+  ): Promise<{ message: string }> {
     return this.assessmentService.submit(req.user.userId, data);
   }
 }
