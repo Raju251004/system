@@ -10,6 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../users/users.service';
 
@@ -18,7 +19,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -56,5 +57,11 @@ export class AuthController {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...result } = user;
     return result;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('profile') // Using Post or Patch
+  async updateProfile(@Request() req: { user: { userId: string } }, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.usersService.update(req.user.userId, updateProfileDto);
   }
 }

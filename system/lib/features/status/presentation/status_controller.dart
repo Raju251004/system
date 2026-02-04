@@ -22,4 +22,16 @@ class StatusController extends AsyncNotifier<Map<String, dynamic>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchProfile());
   }
+
+  Future<void> updateProfile(Map<String, dynamic> updates) async {
+    state = const AsyncValue.loading();
+    final repository = ref.read(statusRepositoryProvider);
+    await AsyncValue.guard(() async {
+      await repository.updateProfile(updates);
+      // Refresh to get new data back
+      return _fetchProfile();
+    });
+    // After update, refresh state
+    ref.invalidateSelf();
+  }
 }

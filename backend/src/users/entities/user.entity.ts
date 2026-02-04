@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Assessment } from '../../assessment/entities/assessment.entity';
 
 export enum Rank {
   E = 'E',
@@ -61,6 +63,9 @@ export class User {
 
   @Column({ default: false })
   isOnboardingCompleted: boolean;
+
+  @OneToMany(() => Assessment, (assessment) => assessment.user)
+  assessments: Assessment[];
 
   @CreateDateColumn()
   createdAt: Date;

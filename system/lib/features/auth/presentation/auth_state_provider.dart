@@ -28,10 +28,12 @@ class AuthStateNotifier extends AsyncNotifier<AuthStatus> {
     try {
       final statusRepo = ref.read(statusRepositoryProvider);
       final profile = await statusRepo.getProfile();
+      print('DEBUG: Profile fetched: $profile'); // Debug log
 
       // Check if onboarding is completed
       // The backend now returns isOnboardingCompleted in the profile
       final isCompleted = profile['isOnboardingCompleted'] as bool? ?? false;
+      print('DEBUG: isOnboardingCompleted: $isCompleted'); // Debug log
 
       if (isCompleted) {
         return AuthStatus.authenticated;
@@ -39,6 +41,7 @@ class AuthStateNotifier extends AsyncNotifier<AuthStatus> {
         return AuthStatus.onboardingRequired;
       }
     } catch (e) {
+      print('DEBUG: Auth check failed: $e'); // Debug log
       // Token is invalid or expired
       await authRepo.logout();
       return AuthStatus.unauthenticated;

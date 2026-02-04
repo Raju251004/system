@@ -8,7 +8,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(userData: DeepPartial<User>): Promise<User> {
     const existingEmail = await this.usersRepository.findOneBy({
@@ -45,12 +45,24 @@ export class UsersService {
   }
 
   async update(id: string, updateData: DeepPartial<User>): Promise<User> {
-    await this.usersRepository.update(id, updateData);
     const user = await this.findOne(id);
     if (!user) {
       throw new Error(`User with ID ${id} not found`);
     }
-    return user;
+
+    // Deep merge stats if they exist in updateData
+    if (updateData.stats && user.stats) {
+      user.stats = {
+        ...user.stats,
+        ...updateData.stats,
+      };
+      delete updateData.stats; // Remove from top level to avoid overwrite during object assign if needed
+    }
+
+    // Assign other properties
+    Object.assign(user, updateData);
+
+    return this.usersRepository.save(user);
   }
 
   async addXp(userId: string, amount: number): Promise<User> {

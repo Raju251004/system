@@ -1,63 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:system/features/quests/domain/quest_model.dart';
 import 'package:system/features/quests/presentation/widgets/quest_card.dart';
+import 'package:system/features/quests/presentation/quest_controller.dart';
 
-class QuestScreen extends StatefulWidget {
+class QuestScreen extends ConsumerWidget {
   const QuestScreen({super.key});
-
-  @override
-  State<QuestScreen> createState() => _QuestScreenState();
-}
-
-class _QuestScreenState extends State<QuestScreen> {
-  // Local state for MVP
-  final List<Quest> _quests = [
-    const Quest(
-      id: '1',
-      title: 'STRENGTH TRAINING [DAILY]',
-      description: '100 Pushups\n100 Situps\n100 Squats\n10km Run',
-      reward: 'Recover Fatigue, +3 Stat Points',
-      difficulty: 'E',
-      isCompleted: false,
-    ),
-    const Quest(
-      id: '2',
-      title: 'MEDITATION',
-      description: 'Clear your mind for 15 minutes.',
-      reward: '+1 Intelligence',
-      difficulty: 'D',
-      isCompleted: false,
-    ),
-    const Quest(
-      id: '3',
-      title: 'CODE REVIEW',
-      description: 'Review 3 Pull Requests on GitHub.',
-      reward: '+2 Intelligence',
-      difficulty: 'C',
-      isCompleted: false,
-    ),
-  ];
 
   static const Color _bgDark = Color(0xFF0F0518);
   static const Color _systemBlue = Color(0xFF00AEEF);
-
-  void _toggleQuest(int index) {
-    setState(() {
-      _quests[index] = _quests[index].copyWith(
-        isCompleted: !_quests[index].isCompleted,
-      );
-    });
-
-    if (_quests[index].isCompleted) {
-      // Play sound or show snackbar later
-    }
-  }
+  static const Color _penaltyRed = Color(0xFFFF0000);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quests = ref.watch(questControllerProvider);
+    
+    // Check if we are in penalty mode
+    final isPenalty = quests.length == 1 && quests.first.id == 'PENALTY';
+
     return Scaffold(
-      backgroundColor: _bgDark,
+      backgroundColor: isPenalty ? const Color(0xFF220000) : _bgDark, // Red tint for penalty
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -65,34 +28,58 @@ class _QuestScreenState extends State<QuestScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              Text(
-                'QUESTS',
-                style: GoogleFonts.orbitron(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                   Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                          isPenalty ? 'PENALTY' : 'QUESTS',
+                          style: GoogleFonts.orbitron(
+                            color: isPenalty ? _penaltyRed : Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        Text(
+                          isPenalty ? 'SURVIVE' : 'SYSTEM ALERTS',
+                          style: GoogleFonts.rajdhani(
+                            color: isPenalty ? _penaltyRed.withOpacity(0.7) : _systemBlue,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                     ],
+                   ),
+                   // Debug Button for Punishment (Hidden feature for testing)
+                   if (!isPenalty)
+                     IconButton(
+                       icon: const Icon(Icons.bug_report, color: Colors.white24),
+                       onPressed: () => ref.read(questControllerProvider.notifier).debugTriggerPunishment(),
+                     ),
+                   if (isPenalty)
+                      IconButton(
+                       icon: const Icon(Icons.restore, color: Colors.white24),
+                       onPressed: () => ref.read(questControllerProvider.notifier).debugReset(),
+                     ),
+                ],
               ),
-              Text(
-                'SYSTEM ALERTS',
-                style: GoogleFonts.rajdhani(
-                  color: _systemBlue,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
+              
               const SizedBox(height: 32),
 
               // List
               Expanded(
-                child: ListView.builder(
-                  itemCount: _quests.length,
+                child: quests.isEmpty 
+                ? Center(child: Text("NO QUESTS AVAILABLE", style: GoogleFonts.orbitron(color: Colors.white54)))
+                : ListView.builder(
+                  itemCount: quests.length,
                   itemBuilder: (context, index) {
                     return QuestCard(
-                      quest: _quests[index],
-                      onToggle: () => _toggleQuest(index),
+                      quest: quests[index],
+                      onToggle: () => ref.read(questControllerProvider.notifier).toggleQuest(quests[index].id),
                     );
                   },
                 ),

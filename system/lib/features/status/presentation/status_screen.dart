@@ -5,6 +5,8 @@ import 'package:system/core/theme/app_theme.dart';
 import 'package:system/features/auth/presentation/auth_state_provider.dart';
 import 'package:system/features/home/presentation/welcome_screen.dart';
 import 'package:system/features/status/presentation/status_controller.dart';
+import 'package:system/features/status/presentation/widgets/radar_chart_widget.dart';
+import 'package:system/features/status/presentation/widgets/edit_profile_dialog.dart';
 import 'dart:async';
 
 class StatusScreen extends ConsumerStatefulWidget {
@@ -21,6 +23,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   static const Color _accentBlue = Color(0xFF2E86DE); // Jin-Woo Blue
   static const Color _neonBlue = Color(0xFF00D2D3);
   static const Color _alertRed = Color(0xFFFF4757);
+  static const Color _activeGreen = Color(0xFF00FF00); // Active Player Green
 
   Timer? _timer;
   Duration _timeUntilReset = const Duration(hours: 0, minutes: 0, seconds: 0);
@@ -69,20 +72,49 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
 
     return Scaffold(
       backgroundColor: _bgDark,
+      // Custom AppBar for Player Status
       appBar: AppBar(
-        title: Text(
-          'PLAYER STATUS',
-          style: GoogleFonts.orbitron(
-            fontSize: 20, // Compact size
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 2,
-          ),
-        ),
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        titleSpacing: 20,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                 border: Border.all(color: _activeGreen),
+                 borderRadius: BorderRadius.circular(4),
+                 color: _activeGreen.withOpacity(0.1),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 6, height: 6,
+                    decoration: const BoxDecoration(color: _activeGreen, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 6),
+                  Text('ACTIVE PLAYER', style: GoogleFonts.rajdhani(color: _activeGreen, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white54),
+            onPressed: () {
+               showDialog(
+                 context: context, 
+                 builder: (context) => EditProfileDialog(
+                    currentData: state.asData?.value ?? {}, 
+                    onSave: (updates) {
+                       ref.read(statusControllerProvider.notifier).updateProfile(updates);
+                    }
+                 ),
+               );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh, color: _accentBlue),
             onPressed: () =>
@@ -117,12 +149,135 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   }
 
   Widget _buildBody(Map<String, dynamic> data) {
+    // Current Level & Rank
+    final level = data['level'] ?? 1;
+    final String rank = "E"; // Placeholder or derived from level
+    final String currentTitle = "THE AWAKENED"; // Placeholder
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Center stage alignment
         children: [
-          // 1. Time Remaining Panel
+          
+          // 1. Profile & Title Header
+          Text(
+             data['username']?.toUpperCase() ?? 'PLAYER',
+             style: GoogleFonts.orbitron(
+               fontSize: 24,
+               fontWeight: FontWeight.bold,
+               color: Colors.white,
+               letterSpacing: 2
+             ),
+          ),
+          const SizedBox(height: 8),
           Container(
+             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+             decoration: BoxDecoration(
+               color: _accentBlue.withOpacity(0.2),
+               borderRadius: BorderRadius.circular(12),
+               border: Border.all(color: _accentBlue),
+             ),
+             child: Text(
+               currentTitle,
+               style: GoogleFonts.rajdhani(
+                 color: Colors.white,
+                 fontWeight: FontWeight.bold,
+                 fontSize: 12,
+                 letterSpacing: 1.5,
+               ),
+             ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // 2. Rank & Level (Center Stage)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               _buildCenterStat("LEVEL", "$level"),
+               Container(height: 40, width: 1, color: Colors.white24, margin: const EdgeInsets.symmetric(horizontal: 30)),
+               _buildCenterStat("RANK", rank),
+            ],
+          ),
+
+          const SizedBox(height: 32),
+
+          // 3. XP Progress Bar (Neon Gradient)
+          Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+                Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                   children: [
+                      Text("EXP", style: GoogleFonts.rajdhani(color: Colors.white70, fontWeight: FontWeight.bold)),
+                      Text("${data['xp'] ?? 0} / 1000", style: GoogleFonts.rajdhani(color: _neonBlue, fontWeight: FontWeight.bold)),
+                   ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                   height: 6,
+                   width: double.infinity,
+                   decoration: BoxDecoration(
+                     color: Colors.white10,
+                     borderRadius: BorderRadius.circular(3),
+                   ),
+                   child: LayoutBuilder(
+                      builder: (context, constraints) {
+                         double percent = ((data['xp'] ?? 0) / 1000).clamp(0.0, 1.0);
+                         return Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                               width: constraints.maxWidth * percent,
+                               height: 6,
+                               decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  gradient: const LinearGradient(
+                                     colors: [_accentBlue, _neonBlue],
+                                  ),
+                                  boxShadow: [
+                                     BoxShadow(color: _neonBlue.withOpacity(0.6), blurRadius: 6, spreadRadius: 1),
+                                  ],
+                               ),
+                            ),
+                         );
+                      },
+                   ),
+                ),
+             ],
+          ),
+
+          const SizedBox(height: 40),
+
+          // 4. "Essence Scan" Radar Chart
+          Text(
+            "ESSENCE SCAN",
+             style: GoogleFonts.rajdhani(
+               color: Colors.white54,
+               fontSize: 12,
+               fontWeight: FontWeight.bold,
+               letterSpacing: 3,
+             ),
+          ),
+          const SizedBox(height: 16),
+          // Mapping data to new keys: Strength (Physical), Intelligence (Mental), Technical, Habits, Consistency
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: RadarChartWidget(
+              attributes: {
+                'PHY': data['strength'] ?? 10,
+                'MEN': data['intelligence'] ?? 10,
+                'TEC': data['agility'] ?? 10, // Mapping Agility to Technical/Studies
+                'HAB': data['vitality'] ?? 10, // Mapping Vitality to Habits
+                'CON': data['perception'] ?? 10, // Mapping Perception to Consistency
+              },
+            ),
+          ),
+          
+          const SizedBox(height: 40),
+
+          // 5. Time Remaining (Penalty Zone)
+           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             decoration: BoxDecoration(
               border: Border.all(color: _alertRed.withOpacity(0.5)),
@@ -133,7 +288,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'PENALTY ZONE RESET',
+                  'PENALTY ZERO',
                   style: GoogleFonts.rajdhani(
                     color: _alertRed,
                     fontWeight: FontWeight.bold,
@@ -152,156 +307,21 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-
-          // 2. Profile Header (Compact)
-          Row(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: _neonBlue, width: 2),
-                  color: _cardBg,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  data['username']?.substring(0, 1).toUpperCase() ?? 'P',
-                  style: GoogleFonts.orbitron(
-                    fontSize: 32,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data['username']?.toUpperCase() ?? 'PLAYER',
-                      style: GoogleFonts.orbitron(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'LEVEL ${data['level'] ?? 1}  •  ${data['job'] ?? 'NONE'}',
-                      style: GoogleFonts.rajdhani(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // XP Bar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(2),
-                      child: LinearProgressIndicator(
-                        value: ((data['xp'] ?? 0) / 1000).clamp(0.0, 1.0),
-                        backgroundColor: Colors.white10,
-                        valueColor: const AlwaysStoppedAnimation(_accentBlue),
-                        minHeight: 4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-          const Divider(color: Colors.white24),
-          const SizedBox(height: 16),
-
-          // 3. Stats Grid
-          _buildSectionHeader('STATISTICS'),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: _buildStatCard('STRENGTH', data['strength'])),
-              const SizedBox(width: 10),
-              Expanded(child: _buildStatCard('AGILITY', data['agility'])),
-              const SizedBox(width: 10),
-              Expanded(child: _buildStatCard('INTEL', data['intelligence'])),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _buildStatCard('VITALITY', data['vitality'])),
-              const SizedBox(width: 10),
-              Expanded(child: _buildStatCard('SENSE', data['perception'])),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // 4. Notifications / Messages
-          _buildSectionHeader('NOTIFICATIONS'),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: _cardBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildNotifItem('Daily Quest "Pushups" has arrived.', 'Now'),
-                const Divider(color: Colors.white10, height: 24),
-                _buildNotifItem('Welcome to the System.', '2h ago'),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-          // 5. Ranking Score
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [_accentBlue.withOpacity(0.2), Colors.transparent],
-              ),
-              borderRadius: BorderRadius.circular(8),
-              border: Border(left: BorderSide(color: _neonBlue, width: 4)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'GLOBAL RANKING',
-                      style: GoogleFonts.rajdhani(
-                        color: _neonBlue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '#14,203',
-                      style: GoogleFonts.orbitron(
-                        color: Colors.white,
-                        fontSize: 24,
-                      ),
-                    ),
-                  ],
-                ),
-                Icon(Icons.emoji_events, color: AppTheme.gold, size: 32),
-              ],
-            ),
-          ),
         ],
       ),
     );
+  }
+
+  Widget _buildCenterStat(String label, String value) {
+     return Column(
+        children: [
+           Text(label, style: GoogleFonts.rajdhani(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+           const SizedBox(height: 4),
+           Text(value, style: GoogleFonts.orbitron(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold, letterSpacing: 2, 
+             shadows: [Shadow(color: _accentBlue.withOpacity(0.8), blurRadius: 20)]
+           )),
+        ],
+     );
   }
 
   Widget _buildSectionHeader(String title) {

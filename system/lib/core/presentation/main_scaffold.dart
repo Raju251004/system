@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:system/features/status/presentation/status_screen.dart';
 import 'package:system/features/quests/presentation/quest_screen.dart';
+import 'package:system/features/assessment/presentation/assessment_dashboard.dart';
 
 class MainScaffold extends ConsumerStatefulWidget {
   const MainScaffold({super.key});
@@ -23,6 +24,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   final List<Widget> _screens = [
     const StatusScreen(), // Home / Status
     const QuestScreen(), // Quest List
+    const AssessmentDashboard(), // Fitness Analysis
     const Center(
       child: Text('INVENTORY', style: TextStyle(color: Colors.white)),
     ), // Placeholder
@@ -85,6 +87,11 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               icon: Icon(Icons.assignment_outlined),
               activeIcon: Icon(Icons.assignment),
               label: 'QUESTS',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.analytics_outlined),
+              activeIcon: Icon(Icons.analytics),
+              label: 'ANALYSIS',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.backpack_outlined),

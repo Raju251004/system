@@ -26,4 +26,12 @@ class StatusRepository {
       throw Exception('Failed to fetch status: ${e.toString()}');
     }
   }
+
+  Future<void> updateProfile(Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/auth/profile', data: data);
+    } on DioException catch (e) {
+       throw Exception('Failed to update profile: ${e.message}');
+    }
+  }
 }

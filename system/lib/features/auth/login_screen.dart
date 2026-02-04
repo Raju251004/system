@@ -38,13 +38,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       await ref.read(authControllerProvider.notifier).login(email, password);
+      print('DEBUG: Login successful, refreshing state...');
 
       // Refresh auth state to trigger redirect logic
       await ref.read(authStateProvider.notifier).refresh();
+      print('DEBUG: Auth state refreshed.');
 
       if (mounted) {
-        // Pop the LoginScreen to reveal the MainScaffold
-        Navigator.pop(context);
+        print('DEBUG: Forcing navigation to MainScaffold');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScaffold()),
+          (route) => false,
+        );
       }
     } catch (e) {
       if (mounted) {
