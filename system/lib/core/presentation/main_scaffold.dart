@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:system/features/status/presentation/status_controller.dart';
 import 'package:system/features/status/presentation/status_screen.dart';
-import 'package:system/features/quests/presentation/quest_screen.dart';
-import 'package:system/features/assessment/presentation/assessment_dashboard.dart';
+import 'package:system/features/quests/presentation/quest_board.dart';
+import 'package:system/features/habits/presentation/habit_screen.dart';
+import 'package:system/features/inventory/presentation/inventory_screen.dart';
+import 'package:system/features/training/presentation/training_screen.dart';
 
 class MainScaffold extends ConsumerStatefulWidget {
   const MainScaffold({super.key});
@@ -22,22 +25,50 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   static const Color _neonPurple = Color(0xFFB000FF);
 
   final List<Widget> _screens = [
-    const StatusScreen(), // Home / Status
-    const QuestScreen(), // Quest List
-    const AssessmentDashboard(), // Fitness Analysis
-    const Center(
-      child: Text('INVENTORY', style: TextStyle(color: Colors.white)),
-    ), // Placeholder
-    const Center(
-      child: Text('DUNGEON', style: TextStyle(color: Colors.white)),
-    ), // Placeholder
+    const StatusScreen(), 
+    const QuestBoard(), 
+    const TrainingScreen(), // Merged Fitness & Study
+    const InventoryScreen(),
+    const HabitScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final userAsync = ref.watch(statusControllerProvider);
+    final hp = userAsync.asData?.value.hp ?? 100;
+    final isCritical = hp <= 20;
+
     return Scaffold(
       backgroundColor: _bgDark,
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: Stack(
+         children: [
+            IndexedStack(index: _currentIndex, children: _screens),
+            
+            // Penalty Overlay
+            if (isCritical)
+               IgnorePointer(
+                  child: Container(
+                     decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                           colors: [Colors.transparent, Colors.red.withOpacity(0.3)],
+                           radius: 1.5,
+                           center: Alignment.center,
+                        )
+                     ),
+                     child: Center(
+                        child: Text(
+                           "SYSTEM WARNING: HP CRITICAL",
+                           style: GoogleFonts.orbitron(
+                              color: Colors.red.withOpacity(0.1), 
+                              fontSize: 12, 
+                              letterSpacing: 4
+                           ),
+                        ),
+                     ),
+                  ),
+               ),
+         ],
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: _navBg,
@@ -89,9 +120,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               label: 'QUESTS',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.analytics_outlined),
-              activeIcon: Icon(Icons.analytics),
-              label: 'ANALYSIS',
+              icon: Icon(Icons.bolt_outlined),
+              activeIcon: Icon(Icons.bolt), // Training Icon
+              label: 'TRAINING',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.backpack_outlined),
@@ -99,9 +130,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               label: 'INVENTORY',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.castle_outlined),
-              activeIcon: Icon(Icons.castle),
-              label: 'DUNGEON',
+              icon: Icon(Icons.check_circle_outline),
+              activeIcon: Icon(Icons.check_circle),
+              label: 'HABITS',
             ),
           ],
         ),

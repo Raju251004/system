@@ -16,11 +16,17 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('quests')
 export class QuestsController {
-  constructor(private readonly questsService: QuestsService) {}
+  constructor(private readonly questsService: QuestsService) { }
 
   @Post()
   create(@Body() createQuestDto: CreateQuestDto) {
     return this.questsService.create(createQuestDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('daily')
+  getDaily(@Request() req: { user: { userId: string } }) {
+    return this.questsService.generateDailyQuests(req.user.userId);
   }
 
   @Get()

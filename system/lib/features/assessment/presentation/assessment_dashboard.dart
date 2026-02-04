@@ -55,11 +55,10 @@ class AssessmentDashboard extends ConsumerWidget {
                 const SizedBox(height: 32),
                 Text("START ASSESSMENT", style: GoogleFonts.rajdhani(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                SizedBox(
+                  height: 120, // Fixed height for carousel
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
                     children: [
                       _buildAssessmentCard(context, 'PUSHUPS', Icons.fitness_center),
                       _buildAssessmentCard(context, 'SQUATS', Icons.accessibility_new),
@@ -67,8 +66,46 @@ class AssessmentDashboard extends ConsumerWidget {
                       _buildAssessmentCard(context, 'RUNNING', Icons.directions_run),
                       _buildAssessmentCard(context, 'SKIPPING', Icons.refresh),
                       _buildAssessmentCard(context, 'SIT_AND_REACH', Icons.height),
+                      _buildAssessmentCard(context, 'STUDY_SESSION', Icons.menu_book), // New Study Task
                     ],
                   ),
+                ),
+                const SizedBox(height: 32),
+                Text("RECENT HISTORY", style: GoogleFonts.rajdhani(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                Expanded(
+                   child: ListView.builder(
+                      itemCount: (stats['history'] as List?)?.length ?? 0,
+                      itemBuilder: (context, index) {
+                         final history = (stats['history'] as List)[index];
+                         final date = DateTime.tryParse(history['createdAt'] ?? '') ?? DateTime.now();
+                         return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                               color: const Color(0xFF151520),
+                               borderRadius: BorderRadius.circular(8),
+                               border: Border.all(color: Colors.white10),
+                            ),
+                            child: Row(
+                               children: [
+                                  Icon(Icons.check_circle_outline, color: _neonBlue, size: 20),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                     child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                           Text(history['type']?.toString().replaceAll('_', ' ') ?? 'UNKNOWN', style: GoogleFonts.rajdhani(color: Colors.white, fontWeight: FontWeight.bold)),
+                                           Text("${date.day}/${date.month} ${date.hour}:${date.minute}", style: GoogleFonts.rajdhani(color: Colors.white38, fontSize: 12)),
+                                        ],
+                                     ),
+                                  ),
+                                  Text("${history['score']} PTS", style: GoogleFonts.orbitron(color: _neonBlue, fontWeight: FontWeight.bold)),
+                               ],
+                            ),
+                         );
+                      },
+                   ),
                 ),
               ],
             ),
@@ -84,6 +121,8 @@ class AssessmentDashboard extends ConsumerWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => WorkoutInputScreen(type: title)));
       },
       child: Container(
+        width: 100, // Fixed width for horizontal list
+        margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: const Color(0xFF1A0B2E),
           borderRadius: BorderRadius.circular(12),
@@ -92,9 +131,13 @@ class AssessmentDashboard extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.blueAccent, size: 40),
-            const SizedBox(height: 10),
-            Text(title.replaceAll('_', ' '), style: GoogleFonts.rajdhani(color: Colors.white, fontWeight: FontWeight.bold)),
+            Icon(icon, color: Colors.blueAccent, size: 30),
+            const SizedBox(height: 8),
+            Text(
+               title.replaceAll('_', ' '), 
+               textAlign: TextAlign.center,
+               style: GoogleFonts.rajdhani(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)
+            ),
           ],
         ),
       ),

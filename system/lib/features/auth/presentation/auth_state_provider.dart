@@ -32,7 +32,7 @@ class AuthStateNotifier extends AsyncNotifier<AuthStatus> {
 
       // Check if onboarding is completed
       // The backend now returns isOnboardingCompleted in the profile
-      final isCompleted = profile['isOnboardingCompleted'] as bool? ?? false;
+      final isCompleted = profile.isOnboardingCompleted;
       print('DEBUG: isOnboardingCompleted: $isCompleted'); // Debug log
 
       if (isCompleted) {

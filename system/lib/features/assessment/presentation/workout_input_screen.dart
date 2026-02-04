@@ -71,6 +71,7 @@ class _WorkoutInputScreenState extends ConsumerState<WorkoutInputScreen> {
       case 'RUNNING': return "Run a set distance and record the time.";
       case 'SKIPPING': return "Count successful skips and missed attempts.";
       case 'SIT_AND_REACH': return "Measure distance past toes in centimeters.";
+      case 'STUDY_SESSION': return "Enter study duration in minutes.";
       default: return "";
     }
   }
@@ -96,6 +97,8 @@ class _WorkoutInputScreenState extends ConsumerState<WorkoutInputScreen> {
          ];
       case 'SIT_AND_REACH':
          return [_buildTextField('cm', 'Distance (cm)')];
+      case 'STUDY_SESSION':
+         return [_buildTextField('minutes', 'Duration (Minutes)')];
       default:
         return [];
     }

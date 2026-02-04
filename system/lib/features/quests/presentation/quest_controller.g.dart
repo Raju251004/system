@@ -13,7 +13,7 @@ part of 'quest_controller.dart';
 final questControllerProvider = QuestControllerProvider._();
 
 final class QuestControllerProvider
-    extends $NotifierProvider<QuestController, List<Quest>> {
+    extends $AsyncNotifierProvider<QuestController, List<Quest>> {
   QuestControllerProvider._()
     : super(
         from: null,
@@ -31,29 +31,21 @@ final class QuestControllerProvider
   @$internal
   @override
   QuestController create() => QuestController();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<Quest> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<List<Quest>>(value),
-    );
-  }
 }
 
-String _$questControllerHash() => r'0f065a629ace49166c1ff72b7dc7054b59bc26cb';
+String _$questControllerHash() => r'325cf3a283d971ac04be1c8d1ca318a4ca8d18e1';
 
-abstract class _$QuestController extends $Notifier<List<Quest>> {
-  List<Quest> build();
+abstract class _$QuestController extends $AsyncNotifier<List<Quest>> {
+  FutureOr<List<Quest>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<List<Quest>, List<Quest>>;
+    final ref = this.ref as $Ref<AsyncValue<List<Quest>>, List<Quest>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<Quest>, List<Quest>>,
-              List<Quest>,
+              AnyNotifier<AsyncValue<List<Quest>>, List<Quest>>,
+              AsyncValue<List<Quest>>,
               Object?,
               Object?
             >;

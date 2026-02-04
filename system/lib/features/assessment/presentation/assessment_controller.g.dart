@@ -34,7 +34,7 @@ final class AssessmentControllerProvider
 }
 
 String _$assessmentControllerHash() =>
-    r'9b998eacc08a0627f8ee0254e90c8a0a907c6fed';
+    r'38715a22f00c0bd45c7bad6f264c25da8f343bb5';
 
 abstract class _$AssessmentController
     extends $AsyncNotifier<Map<String, dynamic>> {

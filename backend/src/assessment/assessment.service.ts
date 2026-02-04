@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Assessment, AssessmentType } from './entities/assessment.entity';
 import { CreateAssessmentDto } from './dto/create-assessment.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AssessmentService {
   constructor(
     @InjectRepository(Assessment)
     private assessmentRepository: Repository<Assessment>,
+    private usersService: UsersService,
   ) { }
 
   async create(userId: string, createAssessmentDto: CreateAssessmentDto): Promise<Assessment> {
@@ -20,6 +22,39 @@ export class AssessmentService {
       data: createAssessmentDto.data,
       score,
     });
+
+    // Reward User: XP + Stats
+    await this.usersService.addXp(userId, Math.round(score * 2)); // 100 Score = 200 XP
+
+    // Stat Growth logic if performance is good (Average/Good+)
+    if (score >= 60) {
+      const user = await this.usersService.findOne(userId);
+      if (user) {
+        const stats = user.stats || { str: 10, agi: 10, vit: 10, int: 10, per: 10 };
+        const bonus = score >= 90 ? 2 : 1; // +2 for Excellent, +1 for Average/Good
+
+        switch (createAssessmentDto.type) {
+          case AssessmentType.PUSHUPS:
+          case AssessmentType.SQUATS:
+            stats.str += bonus;
+            break;
+          case AssessmentType.PLANK:
+            stats.vit += bonus;
+            break;
+          case AssessmentType.RUNNING:
+          case AssessmentType.SIT_AND_REACH:
+            stats.agi += bonus;
+            break;
+          case AssessmentType.SKIPPING:
+            stats.per += bonus;
+            break;
+          case AssessmentType.STUDY_SESSION:
+            stats.int += bonus;
+            break;
+        }
+        await this.usersService.update(userId, { stats });
+      }
+    }
 
     return this.assessmentRepository.save(assessment);
   }
@@ -50,6 +85,7 @@ export class AssessmentService {
       average: Math.round(average),
       level,
       totalAssessments: assessments.length,
+      history: assessments, // Return full history
     };
   }
 
@@ -62,6 +98,7 @@ export class AssessmentService {
     const STD_PLANK_SEC = 120;
     const STD_RUNNING_PACE = 300; // 5 min/km (300 sec/km)
     const STD_SIT_REACH = 30; // cm
+    const STD_STUDY_MIN = 60; // 1 Hour Standard
 
     switch (type) {
       case AssessmentType.PUSHUPS:
@@ -107,6 +144,12 @@ export class AssessmentService {
         // Compare with standard. Let's use simple ratio
         const cm = Number(data.cm || 0);
         score = (cm / STD_SIT_REACH) * 100;
+        break;
+
+      case AssessmentType.STUDY_SESSION:
+        // Ability Score = (User Minutes / Standard Minutes) * 100
+        const minutes = Number(data.minutes || 0);
+        score = (minutes / STD_STUDY_MIN) * 100;
         break;
     }
 

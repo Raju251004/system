@@ -49,8 +49,22 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
       content: SingleChildScrollView(
         child: Column(
           children: [
-            _buildInput("Level", _levelController),
-            _buildInput("Job Class", _jobController),
+            // AVATAR SELECTION
+            Text("AVATAR", style: GoogleFonts.rajdhani(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+               scrollDirection: Axis.horizontal,
+               child: Row(
+                  children: [
+                     _buildAvatarOption('assets/avatars/avatar_1.png', Colors.blue),
+                     _buildAvatarOption('assets/avatars/avatar_2.png', Colors.red),
+                     _buildAvatarOption('assets/avatars/avatar_3.png', Colors.green),
+                     _buildAvatarOption('assets/avatars/avatar_4.png', Colors.amber),
+                  ],
+               ),
+            ),
+            const Divider(color: Colors.white24),
+
             _buildInput("Title", _titleController),
             
             const SizedBox(height: 10),
@@ -82,6 +96,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                  'jobClass': _jobController.text,
                  'title': _titleController.text,
                  'rank': _selectedRank,
+                 'profilePicture': _selectedAvatar, // Save selected avatar
                  'stats': {
                     'str': int.tryParse(_strController.text) ?? 10,
                     'agi': int.tryParse(_agiController.text) ?? 10,
@@ -97,6 +112,29 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         ),
       ],
     );
+  }
+
+  String? _selectedAvatar;
+  
+  // Since we don't have real assets yet, we'll use colors to simulate
+  Widget _buildAvatarOption(String assetPath, Color color) {
+     final isSelected = _selectedAvatar == assetPath;
+     return GestureDetector(
+        onTap: () => setState(() => _selectedAvatar = assetPath),
+        child: Container(
+           margin: const EdgeInsets.only(right: 12),
+           padding: const EdgeInsets.all(2),
+           decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: isSelected ? Colors.white : Colors.transparent, width: 2),
+           ),
+           child: CircleAvatar(
+              backgroundColor: color,
+              radius: 20,
+              child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 16) : null,
+           ),
+        ),
+     );
   }
 
   Widget _buildInput(String label, TextEditingController controller) {

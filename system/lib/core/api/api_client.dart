@@ -13,9 +13,9 @@ final dioProvider = Provider<Dio>((ref) {
 
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'http://192.168.137.1:3000', // Using Wireless LAN adapter IP
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
+      baseUrl: 'http://10.117.33.236:3000', // Using Wireless LAN adapter IP
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
     ),
   );
 
@@ -33,3 +33,53 @@ final dioProvider = Provider<Dio>((ref) {
 
   return dio;
 });
+
+final apiClientProvider = Provider<ApiClient>((ref) {
+  return ApiClient(ref.watch(dioProvider));
+});
+
+class ApiClient {
+  final Dio _dio;
+
+  ApiClient(this._dio);
+
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+    try {
+      return await _dio.get(path, queryParameters: queryParameters);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Response> post(String path, dynamic data) async {
+    try {
+      return await _dio.post(path, data: data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Response> patch(String path, dynamic data) async {
+    try {
+      return await _dio.patch(path, data: data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Response> delete(String path) async {
+    try {
+      return await _dio.delete(path);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Exception _handleError(DioException e) {
+    if (e.response != null) {
+      return Exception("API Error: ${e.response?.statusCode} ${e.response?.data}");
+    } else {
+      return Exception("Network Error: ${e.message}");
+    }
+  }
+}

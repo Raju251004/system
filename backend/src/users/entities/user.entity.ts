@@ -43,6 +43,18 @@ export class User {
   @Column({ default: 100 })
   xpToNextLevel: number;
 
+  @Column({ default: 100 })
+  hp: number;
+
+  @Column({ default: 100 })
+  maxHp: number;
+
+  @Column({ default: 0 })
+  currency: number; // Gold/Zenny
+
+  @Column("text", { array: true, default: [] })
+  titles: string[];
+
   @Column({
     type: 'jsonb',
     default: { str: 10, agi: 10, vit: 10, int: 10, per: 10 },
@@ -59,10 +71,25 @@ export class User {
   jobClass: string;
 
   @Column({ nullable: true })
+  profilePicture: string; // URL or Asset ID
+
+  @Column({ nullable: true })
   title: string;
 
   @Column({ default: false })
   isOnboardingCompleted: boolean;
+
+  @Column({ default: 'NORMAL' })
+  status: string; // NORMAL, PUNISHED
+
+  @Column({ default: 0 })
+  streak: number;
+
+  @Column({ default: 0 })
+  dailyQuestProgress: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastActiveDate: Date;
 
   @OneToMany(() => Assessment, (assessment) => assessment.user)
   assessments: Assessment[];

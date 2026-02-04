@@ -8,6 +8,7 @@ export enum AssessmentType {
     RUNNING = 'RUNNING',
     SKIPPING = 'SKIPPING',
     SIT_AND_REACH = 'SIT_AND_REACH',
+    STUDY_SESSION = 'STUDY_SESSION',
 }
 
 @Entity()

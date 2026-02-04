@@ -9,6 +9,8 @@ import 'package:system/features/status/presentation/widgets/radar_chart_widget.d
 import 'package:system/features/status/presentation/widgets/edit_profile_dialog.dart';
 import 'dart:async';
 
+import 'package:system/features/status/domain/user_model.dart';
+
 class StatusScreen extends ConsumerStatefulWidget {
   const StatusScreen({super.key});
 
@@ -102,20 +104,6 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white54),
-            onPressed: () {
-               showDialog(
-                 context: context, 
-                 builder: (context) => EditProfileDialog(
-                    currentData: state.asData?.value ?? {}, 
-                    onSave: (updates) {
-                       ref.read(statusControllerProvider.notifier).updateProfile(updates);
-                    }
-                 ),
-               );
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.refresh, color: _accentBlue),
             onPressed: () =>
                 ref.read(statusControllerProvider.notifier).refresh(),
@@ -148,9 +136,9 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     );
   }
 
-  Widget _buildBody(Map<String, dynamic> data) {
+  Widget _buildBody(User data) {
     // Current Level & Rank
-    final level = data['level'] ?? 1;
+    final level = data.level;
     final String rank = "E"; // Placeholder or derived from level
     final String currentTitle = "THE AWAKENED"; // Placeholder
 
@@ -161,8 +149,71 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
         children: [
           
           // 1. Profile & Title Header
+          GestureDetector(
+            onTap: () {
+               showDialog(
+                 context: context, 
+                 builder: (context) => EditProfileDialog(
+                    currentData: data.toJson(), 
+                    onSave: (updates) {
+                       ref.read(statusControllerProvider.notifier).updateProfile(updates);
+                    }
+                 ),
+               );
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                 // GLOW
+                 Container(
+                    width: 120, height: 120,
+                    decoration: BoxDecoration(
+                       color: _accentBlue.withOpacity(0.1),
+                       shape: BoxShape.circle,
+                       boxShadow: [
+                          BoxShadow(color: _accentBlue.withOpacity(0.3), blurRadius: 40, spreadRadius: 10),
+                       ],
+                    ),
+                 ),
+                 // AVATAR
+                 Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                       shape: BoxShape.circle,
+                       border: Border.all(color: _accentBlue, width: 2),
+                    ),
+                    child: CircleAvatar(
+                       radius: 50,
+                       backgroundColor: Colors.black,
+                       child: data.profilePicture != null && data.profilePicture!.isNotEmpty
+                          ? _buildAvatarIcon(data.profilePicture!)
+                          : Text(
+                              data.username.substring(0, 1).toUpperCase(),
+                              style: GoogleFonts.orbitron(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                    ),
+                 ),
+                 // EDIT BADGE
+                 Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                       padding: const EdgeInsets.all(6),
+                       decoration: const BoxDecoration(
+                          color: _accentBlue,
+                          shape: BoxShape.circle,
+                       ),
+                       child: const Icon(Icons.edit, color: Colors.white, size: 16),
+                    ),
+                 ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
           Text(
-             data['username']?.toUpperCase() ?? 'PLAYER',
+             data.username.toUpperCase(),
              style: GoogleFonts.orbitron(
                fontSize: 24,
                fontWeight: FontWeight.bold,
@@ -211,7 +262,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                    children: [
                       Text("EXP", style: GoogleFonts.rajdhani(color: Colors.white70, fontWeight: FontWeight.bold)),
-                      Text("${data['xp'] ?? 0} / 1000", style: GoogleFonts.rajdhani(color: _neonBlue, fontWeight: FontWeight.bold)),
+                      Text("${data.currentXp} / 1000", style: GoogleFonts.rajdhani(color: _neonBlue, fontWeight: FontWeight.bold)),
                    ],
                 ),
                 const SizedBox(height: 8),
@@ -224,7 +275,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                    ),
                    child: LayoutBuilder(
                       builder: (context, constraints) {
-                         double percent = ((data['xp'] ?? 0) / 1000).clamp(0.0, 1.0);
+                         double percent = ((data.currentXp) / 1000).clamp(0.0, 1.0);
                          return Align(
                             alignment: Alignment.centerLeft,
                             child: Container(
@@ -265,11 +316,11 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RadarChartWidget(
               attributes: {
-                'PHY': data['strength'] ?? 10,
-                'MEN': data['intelligence'] ?? 10,
-                'TEC': data['agility'] ?? 10, // Mapping Agility to Technical/Studies
-                'HAB': data['vitality'] ?? 10, // Mapping Vitality to Habits
-                'CON': data['perception'] ?? 10, // Mapping Perception to Consistency
+                'PHY': data.stats['str'] ?? 10,
+                'MEN': data.stats['int'] ?? 10,
+                'TEC': data.stats['agi'] ?? 10, // Mapping Agility to Technical/Studies
+                'HAB': data.stats['vit'] ?? 10, // Mapping Vitality to Habits
+                'CON': data.stats['per'] ?? 10, // Mapping Perception to Consistency
               },
             ),
           ),
@@ -362,6 +413,17 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildAvatarIcon(String assetId) {
+     // Map IDs to Colors/Icons until real assets are added
+     Color color = Colors.grey;
+     if (assetId.contains('avatar_1')) color = Colors.blue;
+     if (assetId.contains('avatar_2')) color = Colors.red;
+     if (assetId.contains('avatar_3')) color = Colors.green;
+     if (assetId.contains('avatar_4')) color = Colors.amber;
+
+     return Icon(Icons.person, color: color, size: 50);
   }
 
   Widget _buildNotifItem(String text, String time) {
